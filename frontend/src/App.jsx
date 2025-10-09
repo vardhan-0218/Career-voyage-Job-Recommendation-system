@@ -16,6 +16,8 @@ import Applicants from './components/admin/Applicants'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import JobRecommendations from './components/admin/JobRecommendation';
 import SaveJob from './components/admin/SavedJobs'
+
+
 const appRouter = createBrowserRouter([
   {
     path: '/',
