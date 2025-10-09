@@ -74,13 +74,16 @@
     }
   }
 
-.home{
-  background: fixed,linear-gradient(to top, rgba(0,0,0,0.5)50%, rgba(0,0,0,0.5)50%),url('frontend\\src\\assets\\home.jpg') center center / cover no-repeat;
-  box-sizing: border-box; 
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
+.home {
+  background: 
+    linear-gradient(to top, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.5) 50%), 
+    url('/home.jpg') center center / cover no-repeat fixed;
+  box-sizing: border-box;
+  background-position: center;
+  background-repeat: no-repeat;
   background-size: cover;
 }
+
 .bg-white{
   background: none;
   justify-content:space-between;

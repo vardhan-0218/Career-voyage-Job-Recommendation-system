@@ -4,7 +4,7 @@ import HeroSection from './HeroSection'
 import CategoryCarousel from './CategoryCarousel'
 import LatestJobs from './LatestJobs'
 import Footer from './shared/Footer'
-import useGetAllJobs from '@/hooks/useGetAllJobs'
+import useGetAllJobs from '@/hooks/useGetAllJobs' 
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -18,7 +18,7 @@ const Home = () => {
     }
   }, []);
   return (
-    <div className='home'>
+    <div className='home' >
       <Navbar />
       <HeroSection />
       {/*<CategoryCarousel />*/}
