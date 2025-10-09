@@ -8,38 +8,43 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
-dotenv.config({});
+dotenv.config();
 
 const app = express();
 
-// middleware
+// ✅ Middlewares
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// ✅ Proper CORS setup
 const corsOptions = {
   origin: [
-    'http://localhost:5173',           // local development
-    'https://career-voyage.onrender.com'  // your deployed frontend
+    "http://localhost:5173",
+    "https://career-voyage.onrender.com", // your deployed frontend
   ],
-  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // allows sending cookies/tokens
 };
-
-
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // handle preflight requests
 
-const PORT = process.env.PORT || 3000;
-
-// api's
+// ✅ Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
-app.use('/api', jobRoute);
-app.get('/', function(req, res){
-    res.send("<h1>Server Working</h1>")
-  });
 
-app.listen(PORT,()=>{
-    connectDB();
-    console.log(`Server running at port ${PORT}`);
-})
+// 🧩 Default route
+app.get("/", (req, res) => {
+  res.send("<h1>Server Working ✅</h1>");
+});
+
+// ✅ Server start
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  connectDB();
+  console.log(`✅ Server running on port ${PORT}`);
+});
