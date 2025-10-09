@@ -92,6 +92,7 @@ export const login = async (req, res) => {
             phoneNumber: user.phoneNumber,
             location:user.location,
             role: user.role,
+            jobType: user.jobType, // Ensure jobType is included in login response
             profile: user.profile
         }
 
@@ -119,10 +120,16 @@ export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber,location,jobType, bio, skills } = req.body;
         
-        const file = req.file;
-        // cloudinary come here
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        // FIX 1: Initialize cloudResponse to null
+        let cloudResponse = null; 
+        const file = req.file; 
+
+        // FIX 2: Check if a file was uploaded before processing it
+        if (file) {
+            // cloudinary comes here
+            const fileUri = getDataUri(file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        }
 
         let skillsArray;
         if(skills){
@@ -142,11 +149,14 @@ export const updateProfile = async (req, res) => {
         if(email) user.email = email
         if(phoneNumber)  user.phoneNumber = phoneNumber
         if(location) user.location = location
-        if(jobType) user.profile.jobType = jobType
+        // FIX 3: Save jobType at the root level
+        if(jobType) user.jobType = jobType
+        
         if(bio) user.profile.bio = bio
         if(skills) user.profile.skills = skillsArray
       
         // resume comes later here...
+        // FIX 4: Only update resume fields if a new file was successfully uploaded
         if(cloudResponse){
             user.profile.resume = cloudResponse.secure_url // save the cloudinary url
             user.profile.resumeOriginalName = file.originalname // Save the original file name
@@ -162,6 +172,7 @@ export const updateProfile = async (req, res) => {
             phoneNumber: user.phoneNumber,
             location: user.location,
             role: user.role,
+            jobType: user.jobType, // Ensure jobType is included in response
             profile: user.profile
         }
 
