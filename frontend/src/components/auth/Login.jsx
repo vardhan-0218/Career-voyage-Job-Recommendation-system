@@ -10,7 +10,8 @@ import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, setUser } from '@/redux/authSlice';
-import { Loader2 } from 'lucide-react';
+// FIX: Import Eye and EyeOff for the password toggle icon
+import { Loader2, Eye, EyeOff } from 'lucide-react'; 
 
 const Login = () => {
     const [input, setInput] = useState({
@@ -18,6 +19,9 @@ const Login = () => {
         password: '',
         role: '',
     });
+    // FIX: Add state to toggle password visibility
+    const [showPassword, setShowPassword] = useState(false); 
+    
     const { loading, user } = useSelector((store) => store.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -65,13 +69,18 @@ const Login = () => {
             });
         };
     }, []);
+    
+    // Function to toggle password visibility
+    const togglePasswordVisibility = () => {
+        setShowPassword(prev => !prev);
+    };
 
     return (
         <div>
             <Navbar />
-            <div className="flex items-center justify-center max-w-7xl mx-auto">
-                <form onSubmit={submitHandler} className="w-1/2 border border-gray-200 rounded-md p-4 my-10">
-                    <h1 className="font-bold text-xl mb-5">Login</h1>
+            <div className="flex items-center justify-center mx-auto max-w-7xl">
+                <form onSubmit={submitHandler} className="w-1/2 p-4 my-10 border border-gray-200 rounded-md">
+                    <h1 className="mb-5 text-xl font-bold">Login</h1>
                     <div className="my-2">
                         <Label>Email</Label>
                         <Input
@@ -85,14 +94,32 @@ const Login = () => {
 
                     <div className="my-2">
                         <Label>Password</Label>
-                        <Input
-                            type="password"
-                            value={input.password}
-                            name="password"
-                            onChange={changeEventHandler}
-                            placeholder="Enter your password"
-                        />
+                        {/* FIX: Use a flex container to place the icon inside/next to the input */}
+                        <div className="relative"> 
+                            <Input
+                                // FIX: Dynamically set input type based on showPassword state
+                                type={showPassword ? 'text' : 'password'}
+                                value={input.password}
+                                name="password"
+                                onChange={changeEventHandler}
+                                placeholder="Enter your password"
+                                // FIX: Add right padding to prevent text overlap with the icon
+                                className="pr-10" 
+                            />
+                            {/* FIX: Toggle icon */}
+                            <span 
+                                className="absolute text-gray-500 transform -translate-y-1/2 cursor-pointer right-3 top-1/2"
+                                onClick={togglePasswordVisibility}
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-4 h-4" />
+                                ) : (
+                                    <Eye className="w-4 h-4" />
+                                )}
+                            </span>
+                        </div>
                     </div>
+                    
                     <div className="flex items-center justify-between">
                         <RadioGroup className="flex items-center gap-4 my-5">
                             <div className="flex items-center space-x-2">
@@ -121,7 +148,7 @@ const Login = () => {
                     </div>
                     {loading ? (
                         <Button className="w-full my-4">
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Please wait
                         </Button>
                     ) : (
                         <Button type="submit" className="w-full my-4">
