@@ -96,7 +96,14 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' })
+        // FIX: Updated cookie options for deployment/cross-site compatibility
+        // sameSite: 'None' and secure: true are necessary for cross-site cookie delivery via HTTPS (like Render)
+        return res.status(200).cookie("token", token, { 
+            maxAge: 1 * 24 * 60 * 60 * 1000, 
+            httpOnly: true, 
+            sameSite: 'None', 
+            secure: true 
+        })
         .json({
             message: `Welcome back ${user.fullname}`,
             user,
@@ -108,7 +115,13 @@ export const login = async (req, res) => {
 }
 export const logout = async (req, res) => {
     try {
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
+        // FIX: Updated cookie options for logout to match login options
+        return res.status(200).cookie("token", "", { 
+            maxAge: 0, 
+            httpOnly: true, 
+            sameSite: 'None', 
+            secure: true 
+        }).json({
             message: "Logged out successfully.",
             success: true
         })
@@ -120,13 +133,10 @@ export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber,location,jobType, bio, skills } = req.body;
         
-        // FIX 1: Initialize cloudResponse to null
         let cloudResponse = null; 
         const file = req.file; 
 
-        // FIX 2: Check if a file was uploaded before processing it
         if (file) {
-            // cloudinary comes here
             const fileUri = getDataUri(file);
             cloudResponse = await cloudinary.uploader.upload(fileUri.content);
         }
@@ -135,7 +145,7 @@ export const updateProfile = async (req, res) => {
         if(skills){
             skillsArray = skills.split(",");
         }
-        const userId = req.id; // middleware authentication
+        const userId = req.id; 
         let user = await User.findById(userId);
 
         if (!user) {
@@ -149,17 +159,14 @@ export const updateProfile = async (req, res) => {
         if(email) user.email = email
         if(phoneNumber)  user.phoneNumber = phoneNumber
         if(location) user.location = location
-        // FIX 3: Save jobType at the root level
         if(jobType) user.jobType = jobType
         
         if(bio) user.profile.bio = bio
         if(skills) user.profile.skills = skillsArray
       
-        // resume comes later here...
-        // FIX 4: Only update resume fields if a new file was successfully uploaded
         if(cloudResponse){
-            user.profile.resume = cloudResponse.secure_url // save the cloudinary url
-            user.profile.resumeOriginalName = file.originalname // Save the original file name
+            user.profile.resume = cloudResponse.secure_url 
+            user.profile.resumeOriginalName = file.originalname 
         }
 
 
@@ -172,7 +179,7 @@ export const updateProfile = async (req, res) => {
             phoneNumber: user.phoneNumber,
             location: user.location,
             role: user.role,
-            jobType: user.jobType, // Ensure jobType is included in response
+            jobType: user.jobType, 
             profile: user.profile
         }
 
