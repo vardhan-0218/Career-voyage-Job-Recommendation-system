@@ -166,33 +166,17 @@ export const recommendJobs = async (req, res) => {
         });
     }
 };
-export const getSavedJobs = async (req, res) => {
-    try {
-        const userId = req.id;
 
-        const user = await User.findById(userId).populate("SavedJobs");
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        return res.status(200).json({ savedJobs: user.SavedJobs });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error." });
-    }
-};
 export const saveJob = async (req, res) => {
     try {
         const { jobId } = req.body;
-        const userId = req.id; // Populated by isAuthenticated middleware
+        const userId = req.id; // Correct: Uses ID set by isAuthenticated.js
 
         if (!jobId) {
             return res.status(400).json({ message: "Job ID is required." });
         }
 
         const user = await User.findById(userId);
-
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }
@@ -207,6 +191,29 @@ export const saveJob = async (req, res) => {
         await user.save();
 
         return res.status(200).json({ message: "Job saved successfully." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+};
+
+export const getSavedJobs = async (req, res) => {
+    try {
+        const userId = req.id;
+
+        // FIX: Update populate to populate 'SavedJobs' and then populate 'company' within those jobs
+        const user = await User.findById(userId).populate({
+            path: "SavedJobs",
+            populate: {
+                path: 'company' // Populate the 'company' field inside each saved Job
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        return res.status(200).json({ savedJobs: user.SavedJobs, success: true });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error." });

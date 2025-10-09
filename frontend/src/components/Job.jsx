@@ -4,6 +4,9 @@ import { Bookmark } from 'lucide-react'
 import { Avatar, AvatarImage } from './ui/avatar'
 import { Badge } from './ui/badge'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'; // <-- REQUIRED
+import { toast } from 'sonner'; // <-- REQUIRED
+import { JOB_API_END_POINT } from '@/utils/constant';
 
 const Job = ({job}) => {
     const navigate = useNavigate();
@@ -18,31 +21,29 @@ const Job = ({job}) => {
 
     const saveJobForLater = async (jobId) => {
         try {
-            const apiBasePath = process.env.REACT_APP_API_BASE_PATH;
-    
-            const response = await fetch(`${apiBasePath}/job/save`, {
-                method: 'POST',
+            // FIX: Use axios and withCredentials for consistent API calls/auth
+            const res = await axios.post(`${JOB_API_END_POINT}/save`, { jobId }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify({ jobId }),
+                withCredentials: true // Use cookie for authentication
             });
     
-            if (!response.ok) {
-                throw new Error('Failed to save the job.');
+            // FIX: Display a toast message based on the response success flag
+            if (res.data.success) {
+                toast.success(res.data.message || 'Job saved successfully!');
+            } else {
+                toast.error(res.data.message || 'Failed to save the job.');
             }
-    
-            const data = await response.json();
-            alert(data.message || 'Job saved successfully!');
         } catch (error) {
             console.error(error);
-            alert('Error saving the job.');
+            // FIX: Display error toast, handling potential error response structure
+            toast.error(error.response?.data?.message || 'Error saving the job. Check if already saved.');
         }
     };    
     
     return (
-        <div className='p-5 rounded-md shadow-xl bg-white border border-gray-100'>
+        <div className='p-5 bg-white border border-gray-100 rounded-md shadow-xl'>
             <div className='flex items-center justify-between'>
                 <p className='text-sm text-gray-500'>{daysAgoFunction(job?.createdAt) === 0 ? "Today" : `${daysAgoFunction(job?.createdAt)} days ago`}</p>
                 <Button variant="outline" className="rounded-full" size="icon"><Bookmark /></Button>
@@ -55,13 +56,13 @@ const Job = ({job}) => {
                     </Avatar>
                 </Button>
                 <div>
-                    <h1 className='font-medium text-lg'>{job?.company?.name}</h1>
+                    <h1 className='text-lg font-medium'>{job?.company?.name}</h1>
                     <p className='text-sm text-gray-500'>India</p>
                 </div>
             </div>
 
             <div>
-                <h1 className='font-bold text-lg my-2'>{job?.title}</h1>
+                <h1 className='my-2 text-lg font-bold'>{job?.title}</h1>
                 <p className='text-sm text-gray-600'><b>Required :</b> {job?.requirements}</p>
             </div>
             <div className='flex items-center gap-2 mt-4'>

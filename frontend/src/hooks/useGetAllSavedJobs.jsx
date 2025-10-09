@@ -1,23 +1,23 @@
-// hooks/useGetAllSavedJobs.js
-import { useEffect, useState } from 'react'
+// File: useGetAllSavedJobs.jsx
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { JOB_API_END_POINT } from '@/utils/constant'; 
 
 const useGetAllSavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
 
   const fetchSavedJobs = async () => {
       try {
-          const response = await fetch('http://localhost:3000/api/v1/job/saved', {
-              headers: {
-                  Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
+          const res = await axios.get(`${JOB_API_END_POINT}/saved`, {
+              withCredentials: true
           });
 
-          if (!response.ok) {
-              throw new Error('Failed to fetch saved jobs.');
+          if (res.data.success) {
+              // The savedJobs array now contains fully populated Job objects (including company)
+              setSavedJobs(res.data.savedJobs); 
+          } else {
+              throw new Error(res.data.message || 'Failed to fetch saved jobs.');
           }
-
-          const data = await response.json();
-          setSavedJobs(data);
       } catch (error) {
           console.error(error);
       }
