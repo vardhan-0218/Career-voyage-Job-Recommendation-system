@@ -37,7 +37,7 @@ const CompanyCreate = () => {
             <Navbar />
             <div className='max-w-4xl mx-auto'>
                 <div className='my-10'>
-                    <h1 className='font-bold text-2xl'>Your Company Name</h1>
+                    <h1 className='text-2xl font-bold'>Your Company Name</h1>
                     <p className='text-grey'>
                         //*What would you like to give your company name? you can change this later.*//
                     </p>

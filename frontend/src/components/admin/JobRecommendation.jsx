@@ -38,8 +38,8 @@ const JobRecommendation = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <Loader2 className="h-10 w-10 animate-spin" />
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="w-10 h-10 animate-spin" />
             </div>
         );
     }
@@ -47,8 +47,8 @@ const JobRecommendation = () => {
     return (
         <div>
             <Navbar />
-            <div className="max-w-7xl mx-auto my-10">
-                <h1 className="font-bold text-xl my-10">Recommended Jobs for You {/*{user?.fullname}*/}</h1>
+            <div className="mx-auto my-10 max-w-7xl">
+                <h1 className="my-10 text-xl font-bold">Recommended Jobs for You {/*{user?.fullname}*/}</h1>
                 {jobs.length === 0 ? (
                     <p>No jobs found based on your profile.</p>
                 ) : (
