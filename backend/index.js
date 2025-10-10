@@ -9,7 +9,7 @@ import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
 // ADDED: Import 'path' to correctly resolve file paths for deployment
-import path from "path"; 
+import path from "path";
 
 dotenv.config();
 
@@ -22,13 +22,13 @@ app.use(cookieParser());
 
 // ✅ Proper CORS setup
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://career-voyage.onrender.com",
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  origin: [
+    "http://localhost:5173",
+    "https://career-voyage.onrender.com",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
@@ -38,7 +38,6 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
-
 // ----------------------------------------------------------------------
 // 🚨 FIX FOR DEPLOYMENT 404 ERRORS 🚨
 // ----------------------------------------------------------------------
