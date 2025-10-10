@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, redirect } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Navbar from './components/shared/Navbar';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
@@ -18,84 +18,32 @@ import JobRecommendations from './components/admin/JobRecommendation';
 import SaveJob from './components/admin/SavedJobs';
 import AppliedJobs from './components/admin/AppliedJobs';
 
-// Root loader: only redirect on fresh open
-const rootLoader = () => {
-  if (!sessionStorage.getItem('visitedBefore')) {
-    sessionStorage.setItem('visitedBefore', 'true');
-    return redirect('/'); // redirect to home
-  }
-  return null; // do nothing if already visited
-};
+// Check if this is a fresh tab (not refresh)
+if (!sessionStorage.getItem('freshTabVisited')) {
+  sessionStorage.setItem('freshTabVisited', 'true');
+  // Optional: clear user session or redux-persist if needed for fresh start
+  localStorage.removeItem('persist:root'); 
+}
 
 const appRouter = createBrowserRouter([
-  {
-    path: '/',
-    element: <Home />,
-    loader: rootLoader, // <-- handles first visit redirect
-  },
-  { 
-    path: '/login',
-    element: <Login /> 
-  },
-  { 
-    path: '/signup', 
-    element: <Signup /> 
-  },
-  { 
-    path: '/jobs', 
-    element: <Jobs /> 
-  },
-  { 
-    path: '/description/:id', 
-    element: <JobDescription /> 
-  },
-  { 
-    path: '/browse', 
-    element: <Browse /> 
-  },
-  { 
-    path: '/profile', 
-    element: <Profile /> 
-  },
-  {
-  path: "/applied-jobs",
-  element: <AppliedJobs />,
- },
+  { path: '/', element: <Home /> },
+  { path: '/login', element: <Login /> },
+  { path: '/signup', element: <Signup /> },
+  { path: '/jobs', element: <Jobs /> },
+  { path: '/description/:id', element: <JobDescription /> },
+  { path: '/browse', element: <Browse /> },
+  { path: '/profile', element: <Profile /> },
+  { path: '/applied-jobs', element: <AppliedJobs /> },
 
-
-  // admin paths
-  { 
-    path:"/admin/companies", 
-    element: <ProtectedRoute><Companies/></ProtectedRoute> 
-  },
-  { 
-    path:"/admin/companies/create", 
-    element: <ProtectedRoute><CompanyCreate/></ProtectedRoute> 
-  },
-  { 
-    path:"/admin/companies/:id", 
-    element:<ProtectedRoute><CompanySetup/></ProtectedRoute> 
-  },
-  { 
-    path:"/admin/jobs", 
-    element:<ProtectedRoute><AdminJobs/></ProtectedRoute> 
-  },
-  { 
-    path:"/admin/jobs/create", 
-    element:<ProtectedRoute><PostJob/></ProtectedRoute> 
-  },
-  { 
-    path:"/admin/jobs/:id/applicants", 
-    element:<ProtectedRoute><Applicants/></ProtectedRoute> 
-  },
-  { 
-    path:"/JobRecommendation", 
-    element:<JobRecommendations /> 
-  },
-  { 
-    path:"/saved-jobs", 
-    element:<SaveJob/> 
-  }
+  // Admin paths
+  { path:"/admin/companies", element: <ProtectedRoute><Companies/></ProtectedRoute> },
+  { path:"/admin/companies/create", element: <ProtectedRoute><CompanyCreate/></ProtectedRoute> },
+  { path:"/admin/companies/:id", element:<ProtectedRoute><CompanySetup/></ProtectedRoute> },
+  { path:"/admin/jobs", element:<ProtectedRoute><AdminJobs/></ProtectedRoute> },
+  { path:"/admin/jobs/create", element:<ProtectedRoute><PostJob/></ProtectedRoute> },
+  { path:"/admin/jobs/:id/applicants", element:<ProtectedRoute><Applicants/></ProtectedRoute> },
+  { path:"/JobRecommendation", element:<JobRecommendations /> },
+  { path:"/saved-jobs", element:<SaveJob/> }
 ]);
 
 function App() {
