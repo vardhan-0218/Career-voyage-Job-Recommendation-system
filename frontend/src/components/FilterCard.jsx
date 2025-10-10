@@ -1,59 +1,73 @@
-import React, { useEffect, useState } from 'react'
-import { RadioGroup, RadioGroupItem } from './ui/radio-group'
-import { Label } from './ui/label'
-import { useDispatch } from 'react-redux'
-import { setSearchedQuery } from '@/redux/jobSlice'
+import React, { useEffect, useState } from 'react';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Label } from './ui/label';
+import { useDispatch } from 'react-redux';
+import { setSearchedQuery } from '@/redux/jobSlice';
+import { Button } from './ui/button';
 
-const fitlerData = [
+const filterData = [
     {
-        fitlerType: "Location",
+        filterType: "Location",
         array: ["Delhi", "Bengaluru", "Hyderabad", "Pune", "Mumbai"]
     },
     {
-        fitlerType: "Industry",
-        array: ["software developer","Frontend Developer", "Backend Developer", "fullstack Developer"]
+        filterType: "Industry",
+        array: ["software developer", "Frontend Developer", "Backend Developer", "Fullstack Developer"]
     },
-    /*{
-        fitlerType: "Salary",
-        array: ["0-5LPA", "5-10LPA", "10-30LPA"]
-    },*/
-]
+];
 
 const FilterCard = () => {
-    const [selectedValue, setSelectedValue] = useState('');
+    const [locationFilter, setLocationFilter] = useState('');
+    const [industryFilter, setIndustryFilter] = useState('');
     const dispatch = useDispatch();
-    const changeHandler = (value) => {
-        setSelectedValue(value);
+
+    useEffect(() => {
+        // Send filters as an object instead of a combined string
+        dispatch(setSearchedQuery({
+            location: locationFilter.toLowerCase(),
+            industry: industryFilter.toLowerCase()
+        }));
+    }, [locationFilter, industryFilter, dispatch]);
+
+    const clearFilters = () => {
+        setLocationFilter('');
+        setIndustryFilter('');
     }
-    useEffect(()=>{
-        dispatch(setSearchedQuery(selectedValue));
-    },[selectedValue]);
+
     return (
-        <div className='w-full bg-white p-3 rounded-md'>
-            <h1 className='font-bold text-lg'>Filter Jobs</h1>
+        <div className='w-full p-3 bg-white rounded-md'>
+            <div className='flex items-center justify-between'>
+                <h1 className='text-lg font-bold'>Filter Jobs</h1>
+                <Button variant="ghost" className="p-1 text-xs text-red-500 h-fit hover:text-red-700" onClick={clearFilters}>
+                    Clear
+                </Button>
+            </div>
             <hr className='mt-3' />
-            <RadioGroup value={selectedValue} onValueChange={changeHandler}>
-                {
-                    fitlerData.map((data, index) => (
-                        <div>
-                            <h1 className='font-bold text-lg'>{data.fitlerType}</h1>
-                            {
-                                data.array.map((item, idx) => {
-                                    const itemId = `id${index}-${idx}`
-                                    return (
-                                        <div className='flex items-center space-x-2 my-2'>
-                                            <RadioGroupItem value={item} id={itemId} />
-                                            <Label htmlFor={itemId}>{item}</Label>
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
-                    ))
-                }
-            </RadioGroup>
+
+            {filterData.map((data) => {
+                const isLocation = data.filterType === "Location";
+                const currentValue = isLocation ? locationFilter : industryFilter;
+                const changeHandler = isLocation ? setLocationFilter : setIndustryFilter;
+
+                return (
+                    <div key={data.filterType} className="my-4">
+                        <h1 className='text-lg font-bold'>{data.filterType}</h1>
+                        <RadioGroup value={currentValue} onValueChange={changeHandler}>
+                            {data.array.map((item, idx) => {
+                                const itemId = `id${data.filterType}-${idx}`;
+                                return (
+                                    <div key={itemId} className='flex items-center my-2 space-x-2'>
+                                        <RadioGroupItem value={item} id={itemId} />
+                                        <Label htmlFor={itemId}>{item}</Label>
+                                    </div>
+                                );
+                            })}
+                        </RadioGroup>
+                    </div>
+                );
+            })}
         </div>
     )
 }
 
-export default FilterCard
+export default FilterCard;

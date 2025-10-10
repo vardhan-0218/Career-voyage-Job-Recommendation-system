@@ -14,6 +14,9 @@ axios.defaults.withCredentials = true;
 
 const persistor = persistStore(store);
 
+// ✅ Purge persisted state on first load
+persistor.purge(); // <-- this will clear persisted state every time the page reloads
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
