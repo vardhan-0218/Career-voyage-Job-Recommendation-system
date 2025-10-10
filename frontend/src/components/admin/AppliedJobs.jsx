@@ -67,23 +67,12 @@ const AppliedJobs = () => {
                     </span>
                   </div>
 
-                  {/* Skills / Tags */}
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {job?.job?.skillsRequired?.length > 0 ? (
-                      job.job.skillsRequired.map((skill, idx) => (
-                        <Badge
-                          key={idx}
-                          variant="secondary"
-                          className="text-gray-700 transition-colors bg-gray-100 hover:bg-indigo-100 hover:text-indigo-700"
-                        >
-                          {skill}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-sm text-gray-400">
-                        No skills listed
-                      </span>
-                    )}
+                  {/* Skills */}
+                  <div className="mt-4 text-gray-700">
+                    <strong>Skills :</strong>{" "}
+                    {job?.job?.requirements && job.job.requirements.length > 0
+                        ? job.job.requirements.join(', ')
+                        : "No skills listed"}
                   </div>
                 </div>
 
