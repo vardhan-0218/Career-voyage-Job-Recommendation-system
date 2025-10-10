@@ -14,6 +14,8 @@ import useGetCompanyById from '@/hooks/useGetCompanyById'
 const CompanySetup = () => {
     const params = useParams();
     useGetCompanyById(params.id);
+
+    const { singleCompany } = useSelector(store => store.company);
     const [input, setInput] = useState({
         name: "",
         description: "",
@@ -21,9 +23,21 @@ const CompanySetup = () => {
         location: "",
         file: null
     });
-    const {singleCompany} = useSelector(store=>store.company);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    // Update form input when company data is loaded
+    useEffect(() => {
+        if (singleCompany) {
+            setInput({
+                name: singleCompany.name || "",
+                description: singleCompany.description || "",
+                website: singleCompany.website || "",
+                location: singleCompany.location || "",
+                file: singleCompany.file || null
+            });
+        }
+    }, [singleCompany]);
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -57,22 +71,22 @@ const CompanySetup = () => {
                 navigate("/admin/companies");
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
+            console.error(error);
+            toast.error(error.response?.data?.message || "Something went wrong!");
         } finally {
             setLoading(false);
         }
     }
 
-    useEffect(() => {
-        setInput({
-            name: singleCompany.name || "",
-            description: singleCompany.description || "",
-            website: singleCompany.website || "",
-            location: singleCompany.location || "",
-            file: singleCompany.file || null
-        })
-    },[singleCompany]);
+    // Show loader while company data is being fetched
+    if (!singleCompany) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                Loading company...
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -80,12 +94,13 @@ const CompanySetup = () => {
             <div className='max-w-xl mx-auto my-10'>
                 <form onSubmit={submitHandler}>
                     <div className='flex items-center gap-5 p-8'>
-                        <Button onClick={() => navigate("/admin/companies")} variant="outline" className="flex items-center gap-2 text-gray-500 font-semibold">
+                        <Button onClick={() => navigate("/admin/companies")} variant="outline" className="flex items-center gap-2 font-semibold text-gray-500">
                             <ArrowLeft />
                             <span>Back</span>
                         </Button>
-                        <h1 className='font-bold text-xl'>Company Setup</h1>
+                        <h1 className='text-xl font-bold'>Company Setup</h1>
                     </div>
+
                     <div className='grid grid-cols-2 gap-4'>
                         <div>
                             <Label>Company Name</Label>
@@ -132,14 +147,23 @@ const CompanySetup = () => {
                             />
                         </div>
                     </div>
+
                     {
-                        loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Update</Button>
+                        loading ? (
+                            <Button className="w-full my-4">
+                                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                                Please wait
+                            </Button>
+                        ) : (
+                            <Button type="submit" className="w-full my-4">
+                                Update
+                            </Button>
+                        )
                     }
                 </form>
             </div>
-
         </div>
     )
 }
 
-export default CompanySetup
+export default CompanySetup;
