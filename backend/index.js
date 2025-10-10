@@ -11,14 +11,11 @@ import applicationRoute from "./routes/application.route.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// ✅ Load environment variables
 dotenv.config();
 
-// ✅ Required for __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Initialize Express
 const app = express();
 
 // -------------------------
@@ -28,18 +25,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ CORS setup
+// -------------------------
+// CORS setup
+// -------------------------
 const corsOptions = {
   origin: [
-    "http://localhost:5173", // dev frontend
-    "https://career-voyage.onrender.com", // deployed frontend
+    "http://localhost:5173",
+    "https://career-voyage.onrender.com",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // handle preflight requests
+app.options("*", cors(corsOptions));
 
 // -------------------------
 // API Routes
@@ -53,6 +52,7 @@ app.use("/api/v1/application", applicationRoute);
 // Serve frontend in production
 // -------------------------
 if (process.env.NODE_ENV === "production") {
+  // Make sure this path points to your actual dist folder
   const frontendPath = path.join(__dirname, "../frontend/dist");
 
   // Serve static files
@@ -63,6 +63,15 @@ if (process.env.NODE_ENV === "production") {
     if (req.originalUrl.startsWith("/api")) {
       return res.status(404).send("API route not found");
     }
+
+    // Add no-cache headers to force fresh load
+    res.set({
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Surrogate-Control": "no-store"
+    });
+
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 } else {
