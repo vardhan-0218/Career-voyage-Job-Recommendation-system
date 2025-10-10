@@ -8,7 +8,13 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -17,33 +23,47 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ Proper CORS setup
+// ✅ CORS setup
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://career-voyage.onrender.com", // your deployed frontend
+    "https://career-voyage.onrender.com",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // allows sending cookies/tokens
+  credentials: true,
 };
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // handle preflight requests
+app.options("*", cors(corsOptions));
 
-// ✅ Routes
+// ✅ API Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
-// 🧩 Default route
-app.get("/", (req, res) => {
-  res.send("<h1>Server Working ✅</h1>");
-});
+// ✅ Serve frontend in production
+if (process.env.NODE_ENV === "production") {
+  const frontendPath = path.join(__dirname, "frontend", "dist");
+  app.use(express.static(frontendPath));
 
-// ✅ Server start
+  // Catch-all for React Router routes
+  app.get("*", (req, res) => {
+    if (!req.originalUrl.startsWith("/api")) {
+      res.sendFile(path.join(frontendPath, "index.html"));
+    } else {
+      res.status(404).send("API route not found");
+    }
+  });
+} else {
+  // Dev mode
+  app.get("/", (req, res) => {
+    res.send("<h1>Server Working ✅ (Development Mode)</h1>");
+  });
+}
+
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   connectDB();
   console.log(`✅ Server running on port ${PORT}`);
