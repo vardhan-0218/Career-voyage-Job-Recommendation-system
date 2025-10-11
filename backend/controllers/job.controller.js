@@ -219,3 +219,73 @@ export const getSavedJobs = async (req, res) => {
         return res.status(500).json({ message: "Internal server error." });
     }
 };
+
+export const removeSavedJob = async (req, res) => {
+    console.log("Delete request received for job:", req.params.jobId);
+    console.log("User:", req.user);
+
+    try {
+        const userId = req.id;
+        const { jobId } = req.params;
+
+        if (!jobId) {
+            return res.status(400).json({
+                message: "Job ID is required.",
+                success: false
+            });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        // If job not in saved list
+        if (!user.SavedJobs.includes(jobId)) {
+            return res.status(400).json({
+                message: "Job is not in saved list.",
+                success: false
+            });
+        }
+
+        // Remove job from SavedJobs array
+        user.SavedJobs.pull(jobId);
+        await user.save();
+
+        return res.status(200).json({
+            message: "Job removed from saved list.",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false
+        });
+    }
+};
+
+export const deleteJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    if (!jobId) {
+      return res.status(400).json({ message: "Job ID is required.", success: false });
+    }
+
+    // Use findByIdAndDelete to avoid issues with remove()
+    const deletedJob = await Job.findByIdAndDelete(jobId);
+
+    if (!deletedJob) {
+      return res.status(404).json({ message: "Job not found.", success: false });
+    }
+
+    return res.status(200).json({ message: "Job deleted successfully.", success: true });
+  } catch (error) {
+    console.error("Delete Job Error:", error); // <-- log the real error
+    return res.status(500).json({ message: "Internal server error.", success: false });
+  }
+};

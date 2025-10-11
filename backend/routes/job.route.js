@@ -1,7 +1,7 @@
 import express from 'express';
 import isAuthenticated from '../middlewares/isAuthenticated.js';
 import {getAdminJobs,getAllJobs,getJobById,postJob,recommendJobs,getSavedJobs,
-    saveJob,}from '../controllers/job.controller.js';
+    saveJob,removeSavedJob,deleteJob}from '../controllers/job.controller.js';
 
 const router = express.Router();
 
@@ -25,5 +25,11 @@ router.post('/save', isAuthenticated, saveJob);
 
 // Route for fetching saved jobs
 router.get('/saved', isAuthenticated, getSavedJobs);
+
+// Route for removing a saved job
+router.delete("/saved/:jobId", isAuthenticated, removeSavedJob);
+
+// DELETE route for admin to remove job
+router.delete("/delete/:id", isAuthenticated, deleteJob);
 
 export default router;
