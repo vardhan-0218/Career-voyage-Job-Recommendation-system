@@ -32,6 +32,7 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "https://career-voyage.onrender.com",
+    "https://career-voyage-job-recommendation-system.onrender.com",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
