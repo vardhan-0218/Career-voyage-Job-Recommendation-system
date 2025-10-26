@@ -9,7 +9,7 @@ const router = express.Router();
 router.route('/post').post(isAuthenticated, postJob);
 
 // Route for getting all jobs
-router.route('/get').get(isAuthenticated, getAllJobs);
+router.route('/get').get(getAllJobs);
 
 // Route for getting all jobs created by an admin
 router.route('/getadminjobs').get(isAuthenticated, getAdminJobs);
